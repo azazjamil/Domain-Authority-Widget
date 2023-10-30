@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css"
+        integrity="sha512-DIW4FkYTOxjCqRt7oS9BFO+nVOwDL4bzukDyDtMO7crjUZhwpyrWBFroq+IqRe6VnJkTpRAS6nhDvf0w+wHmxg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <title>Document</title>
+    <style>
+        .container {
+            width: 100%;
+            background-color: #8F8D8D;
+            border-radius: 20px;
+            padding: 20px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        @media (min-width: 576px) {
+            .container {
+                max-width: 540px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            row-gap: 1rem;
+        }
+
+        .domain-input {
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            margin-right: 5px;
+            padding: 10px 15px;
+            color: #8F8D8D;
+        }
+
+        .btn {
+            cursor: pointer;
+            font-size: 16px;
+            outline: none;
+            font-weight: 600;
+            background-color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #C43030;
+            min-width: 150px;
+        }
+
+        .btn:hover {
+            background-color: #D6D6D6;
+        }
+
+        .authority-header {
+            text-align: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .authority-score {
+            background-color: white;
+            margin-top: 20px;
+            font-size: 20px;
+            color: #797878;
+            margin: 10px auto;
+            border-radius: 5px;
+            max-width: 350px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .search-icon {
+            color: white;
+            font-size: 26px;
+            margin-left: 10px;
+        }
+
+        .btn-div {
+            text-align: center;
+        }
+
+        .buffer {
+            display: none;
+            margin: 0 5px;
+        }
+
+        .span-red {
+            color: #C43030;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="authority-header">Check Domain Authority<i class="fa-solid fa-magnifying-glass search-icon"></i></h2>
+        <div class="input-section"><input type="text" placeholder="Click here to enter a website ..."
+                class="domain-input">
+            <div class="btn-div"><button class="btn">Submit<i class="fa fa-spinner fa-spin buffer"></i></button></div>
+        </div>
+        <div class="center">
+            <div class="authority-score"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
+        integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const authority_score = document.querySelector(".authority-score");
+        const buffer = document.querySelector(".buffer")
+        var btn = document.querySelector(".btn");
+        btn.addEventListener("click", () => {
+            buffer.style.display = "inline-block"
+            btn.disabled = true;
+            const regex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([a-zA-Z0-9.-]+)\.[a-zA-Z]{2,}(?:\/[^\s]*)?$/;
+            const url = document.querySelector(".domain-input").value;
+            if (regex.test(url)) {
+                // var FormData = require("form-data");
+                const formData = new FormData();
+                formData.append("url", url);
+                var config = {
+                    method: "post",
+                    maxBodyLength: Infinity,
+                    url: "https://socialmedia-tirol.com/domainauthority/index.php",
+                    mode: 'no-cors',
+                    // headers: {
+                    //     ...formData.getHeaders(),
+                    // },
+                    data: formData,
+                };
+                axios(config)
+                    .then(function (response) {
+                        const domain_authority = response.data.data.data.data[1]["Domain Authority Score"];
+                        authority_score.innerHTML = `Domain Authority Score:  <span class="span-red">${domain_authority}/100</span>`;
+                        authority_score.style.padding = "10px"
+                        buffer.style.display = "none"
+                        btn.disabled = false;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        buffer.style.display = "none"
+                        btn.disabled = false;
+                    });
+            } else {
+                iziToast.warning({
+                    title: "Warning",
+                    message: "Please enter valid url",
+                    position: 'bottomRight',
+                });
+                buffer.style.display = "none"
+                btn.disabled = false;
+            }
+
+        })
+    </script>
+</body>
+
+</html>
